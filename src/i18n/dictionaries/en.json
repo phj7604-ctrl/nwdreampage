@@ -94,6 +94,7 @@
     "place": "Place",
     "target": "For",
     "capacity": "Capacity",
+    "headcount": "Capacity",
     "people": "",
     "formTitle": "Application form",
     "closedNotice": "Applications for this program are closed.",

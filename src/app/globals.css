@@ -118,6 +118,32 @@ html.dark {
   text-align: center;
 }
 
+/* 체험·교육 안내의 강의내용 팝업 (기존 사이트 모양: 항목 이름 칸 회색, 내용 가운데 정렬) */
+.curriculum-modal > table > tbody > tr > td {
+  text-align: center;
+  vertical-align: middle;
+}
+.curriculum-modal > table > tbody > tr > td:first-child {
+  background: color-mix(in srgb, var(--muted) 10%, transparent);
+  width: 1%;
+}
+.curriculum-modal table table th {
+  background: color-mix(in srgb, var(--muted) 10%, transparent);
+  font-weight: 600;
+}
+.curriculum-modal table table td:last-child {
+  text-align: left;
+}
+@media (max-width: 640px) {
+  .curriculum-modal td,
+  .curriculum-modal th {
+    padding: 0.4rem 0.35rem;
+  }
+  .curriculum-modal table table td:last-child {
+    min-width: 7rem;
+  }
+}
+
 .rich-content a {
   color: var(--brand);
   text-decoration: underline;
