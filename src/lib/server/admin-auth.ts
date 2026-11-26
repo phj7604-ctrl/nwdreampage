@@ -3,14 +3,30 @@
 // 1) 브라우저가 보낸 Firebase ID 토큰을 firebase-admin 으로 검증 (서비스 계정 불필요, 프로젝트 ID만 사용)
 // 2) 그 토큰으로 Firestore admins/{이메일} 문서를 읽어 역할 확인 (보안 규칙상 본인 문서만 읽힘)
 import "server-only";
-import { getApps, initializeApp } from "firebase-admin/app";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
-const PROJECT = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "nwdream-page";
+const PROJECT = process.env.FIREBASE_PROJECT_ID ?? process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "nwdream-page";
+
+/**
+ * 서버용 Firebase 관리자 앱.
+ * 서비스 계정(FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY, Vercel 비밀 환경변수)이 있으면 그 권한으로,
+ * 없으면 프로젝트 ID만으로 초기화한다(ID 토큰 검증은 서비스 계정 없이도 동작).
+ */
+export function adminApp() {
+  const existing = getApps()[0];
+  if (existing) return existing;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  return initializeApp(
+    clientEmail && privateKey
+      ? { credential: cert({ projectId: PROJECT, clientEmail, privateKey }), projectId: PROJECT }
+      : { projectId: PROJECT },
+  );
+}
 
 function adminAuth() {
-  const app = getApps()[0] ?? initializeApp({ projectId: PROJECT });
-  return getAuth(app);
+  return getAuth(adminApp());
 }
 
 export type AdminIdentity = { email: string; role: "super" | "editor" };
