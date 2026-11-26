@@ -1,0 +1,71 @@
+rules_version = '2';
+
+// 남원드림센터 Firestore 보안 규칙
+// - 공개 콘텐츠: 누구나 읽기, 관리자만 쓰기
+// - 신청 내역(applications): 누구나 접수(create), 관리자만 조회·수정·삭제
+// - 관리자 목록(admins/{이메일}): 본인 확인용 읽기, 최고관리자만 추가·삭제
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function adminDoc() {
+      return /databases/$(database)/documents/admins/$(request.auth.token.email);
+    }
+    function isAdmin() {
+      return signedIn() && exists(adminDoc());
+    }
+    function isSuper() {
+      return isAdmin() && get(adminDoc()).data.role == 'super';
+    }
+
+    match /admins/{email} {
+      allow read: if signedIn() && (request.auth.token.email == email || isAdmin());
+      allow write: if isSuper();
+    }
+
+    match /notices/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /programs/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /pages/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 체험·교육 신청: 누구나 접수 가능하되, 모집중인 프로그램에만 정해진 형식으로만 접수
+    match /applications/{id} {
+      function program() {
+        return get(/databases/$(database)/documents/programs/$(request.resource.data.programId));
+      }
+      allow create: if
+        request.resource.data.keys().hasOnly(['programId', 'programTitle', 'answers', 'consent', 'status', 'locale', 'createdAt'])
+        && request.resource.data.programId is string
+        && request.resource.data.programId.size() < 100
+        && exists(/databases/$(database)/documents/programs/$(request.resource.data.programId))
+        && program().data.status == 'open'
+        && program().data.get('published', true) == true
+        && request.resource.data.programTitle is string
+        && request.resource.data.programTitle.size() <= 200
+        && request.resource.data.answers is map
+        && request.resource.data.answers.size() <= 40
+        && request.resource.data.consent == true
+        && request.resource.data.status == 'received'
+        && request.resource.data.locale in ['ko', 'en', 'zh', 'ja']
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

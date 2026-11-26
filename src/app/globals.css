@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* 다크모드: <html class="dark"> 일 때 dark: 유틸리티 적용 (next-themes) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 대표 색: 기존 namwondream.com 의 남색(#303883)을 이어받음 */
+:root {
+  --background: #f8f9fc;
+  --surface: #ffffff;
+  --foreground: #1c1f2e;
+  --muted: #5b6074;
+  --border: #e2e4ec;
+  --brand: #303883;
+  --brand-strong: #232a66;
+  --brand-soft: #eceefa;
+  --accent: #f2b33d;
+}
+
+.dark {
+  --background: #0f1118;
+  --surface: #171a24;
+  --foreground: #e6e8f0;
+  --muted: #9a9fb3;
+  --border: #2a2e3d;
+  --brand: #9aa4ff;
+  --brand-strong: #c3c9ff;
+  --brand-soft: #1e2240;
+  --accent: #f5c35e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-noto-kr), "Apple SD Gothic Neo", "Malgun Gothic",
+    "PingFang SC", "Microsoft YaHei", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+/* 게시글 본문(이관된 아임웹 HTML 포함) */
+.rich-content {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.rich-content p,
+.rich-content div {
+  margin: 0.25em 0;
+}
+.rich-content img {
+  max-width: 100%;
+  height: auto !important;
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+.rich-content table {
+  width: 100% !important;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  display: block;
+  overflow-x: auto;
+}
+.rich-content th,
+.rich-content td {
+  border: 1px solid var(--border) !important;
+  padding: 0.5rem 0.75rem;
+}
+/* 시설·센터 페이지의 안내 표(운영시간·요금·사업 개요): 왼쪽 항목 이름 칸 강조 */
+.info-table {
+  overflow-x: auto; /* 휴대폰에서 넓은 표는 표만 가로로 밀어서 보기 */
+}
+.info-table table {
+  display: table;
+  margin: 0;
+}
+.info-table td,
+.info-table th {
+  vertical-align: top;
+}
+.info-table tr > td:first-child,
+.info-table th {
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+  font-weight: 600;
+  white-space: nowrap;
+  width: 1%;
+}
+
+/* 강의내용 표: 화면 폭에 맞추고, 왼쪽 항목 이름(교육장소 등)과 회차·일자는 줄바꿈하지 않음 */
+.curriculum {
+  overflow-x: auto;
+}
+.curriculum table {
+  display: table;
+  margin: 0.75rem 0 0;
+}
+.curriculum table table {
+  margin: 0;
+}
+.curriculum td:first-child,
+.curriculum th,
+.curriculum table table td:nth-child(2) {
+  white-space: nowrap;
+}
+.curriculum table table th,
+.curriculum table table td:first-child {
+  text-align: center;
+}
+
+.rich-content a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+/* 이관된 본문의 고정 글자색·배경색은 다크모드에서 읽기 어려우므로 다크모드에서만 사이트 색을 따른다
+   (라이트모드에서는 원문의 강조색을 그대로 유지) */
+.dark .rich-content [style*="color"],
+.dark .rich-content font[color] {
+  color: inherit !important;
+}
+.dark .rich-content [style*="background"],
+.dark .rich-content [bgcolor] {
+  background: transparent !important;
+}
+.rich-content [style*="font-size"] {
+  font-size: inherit !important;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  word-break: keep-all;
+}
