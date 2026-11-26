@@ -146,7 +146,7 @@ async function fsList<T>(collection: string): Promise<T[]> {
   cacheLife({ stale: 300, revalidate: 60, expire: 3600 }); // stale 5분 이상이어야 정적 셸에 포함됨
   cacheTag(CONTENT_TAG);
   const res = await fetch(`${BASE}/${collection}?pageSize=300`);
-  if (!res.ok) throw new Error(`Firestore ${collection}: ${res.status}`);
+  if (!res.ok) throw new Error(`Firestore ${collection}: ${res.status} ${(await res.text()).slice(0, 300)}`);
   const json = (await res.json()) as { documents?: FsDoc[] };
   return (json.documents ?? []).map((d) => toDoc<T>(d));
 }
@@ -157,7 +157,7 @@ async function fsGet<T>(path: string): Promise<T | null> {
   cacheTag(CONTENT_TAG);
   const res = await fetch(`${BASE}/${path}`);
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Firestore ${path}: ${res.status}`);
+  if (!res.ok) throw new Error(`Firestore ${path}: ${res.status} ${(await res.text()).slice(0, 300)}`);
   return toDoc<T>((await res.json()) as FsDoc);
 }
 
