@@ -11,7 +11,7 @@ export function adminApp() {
   if (existing) return existing;
   const projectId = process.env.FIREBASE_PROJECT_ID ?? process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\+n/g, "\n"); // \n 또는 \\n(vercel env pull) 모두 줄바꿈으로
   if (!projectId || !clientEmail || !privateKey) throw new Error("Firebase 서비스 계정 환경변수가 없습니다.");
   return initializeApp({ credential: cert({ projectId, clientEmail, privateKey }), projectId });
 }

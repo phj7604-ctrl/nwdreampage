@@ -50,6 +50,8 @@ type Draft = {
   curriculum: Localized;
   archived: boolean;
   group: string;
+  applyStart: string;
+  applyEnd: string;
 };
 
 const FIELD_TYPES: { value: FormFieldType; label: string }[] = [
@@ -186,6 +188,8 @@ function ProgramEditor({ id, close, openApps }: { id: string; close: () => void;
     curriculum: emptyLocalized(),
     archived: false,
     group: "",
+    applyStart: "",
+    applyEnd: "",
   });
   const [draft, setDraft] = useState<Draft | null>(isNew ? blank() : null);
   const [lang, setLang] = useState<Locale>("ko");
@@ -216,6 +220,8 @@ function ProgramEditor({ id, close, openApps }: { id: string; close: () => void;
           curriculum: toLocalized(v.curriculum),
           archived: Boolean(v.archived),
           group: v.group ?? "",
+          applyStart: v.applyStart ?? "",
+          applyEnd: v.applyEnd ?? "",
           form: ((v.form ?? []) as AdminField[]).map((f) => ({
             ...f,
             label: toLocalized(f.label),
@@ -278,6 +284,8 @@ function ProgramEditor({ id, close, openApps }: { id: string; close: () => void;
           published: draft.published,
           archived: draft.archived,
           group: draft.archived ? draft.group.trim() : null,
+          applyStart: draft.applyStart || null,
+          applyEnd: draft.applyEnd || null,
           extraInfo: draft.extraInfo,
           curriculum: draft.curriculum,
           images: draft.images,
@@ -349,6 +357,15 @@ function ProgramEditor({ id, close, openApps }: { id: string; close: () => void;
           <label className="flex items-center gap-2 pt-6 text-sm">
             <input type="checkbox" checked={draft.published} onChange={(e) => set("published", e.target.checked)} /> 사이트에 공개
           </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="신청 받는 기간 — 시작일" hint="비우면 모집 상태만 따름">
+            <input type="date" className={inputCls} value={draft.applyStart} onChange={(e) => set("applyStart", e.target.value)} />
+          </Field>
+          <Field label="신청 받는 기간 — 마감일" hint="이 날이 지나면 신청서가 자동으로 잠겨요">
+            <input type="date" className={inputCls} value={draft.applyEnd} onChange={(e) => set("applyEnd", e.target.value)} />
+          </Field>
         </div>
 
         <div className="flex flex-wrap items-end gap-4 rounded-xl bg-brand-soft p-4">

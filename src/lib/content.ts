@@ -81,6 +81,9 @@ export type Program = {
   extraInfo?: Localized;
   /** 강의내용: 회차별 커리큘럼 표(HTML) */
   curriculum?: Localized;
+  /** 신청 받는 기간 (YYYY-MM-DD). 비우면 모집 상태만 따름 */
+  applyStart?: string | null;
+  applyEnd?: string | null;
   /** 지난 프로그램으로 옮긴 경우 */
   archived?: boolean;
   /** 지난 프로그램 묶음 이름 (예: "2026 - 2") */

@@ -7,18 +7,28 @@ import { applyLink, banners, menu, type MenuItem } from "@/lib/site";
 export async function PageShell({
   current,
   title,
+  bannerTitle,
+  tabs,
   children,
 }: {
   current: MenuItem["key"];
   /** 메뉴 이름 대신 쓸 제목(게시글 상세 등) */
   title?: string;
+  /** 배너 큰 제목을 바꿀 때 (예: 신청서 화면의 "프로그램 신청") */
+  bannerTitle?: string;
+  /** 배너 아래 탭을 메뉴 대신 직접 지정 (예: 신청 가능한 프로그램 목록) */
+  tabs?: { href: string; label: string; active: boolean }[];
   children: ReactNode;
 }) {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
   const group = menu.find((g) => g.children.some((c) => c.key === current));
   const currentHref = [...menu.flatMap((g) => g.children), applyLink].find((c) => c.key === current)?.href ?? "";
   const banner = banners[(group?.key ?? "apply") as keyof typeof banners];
-  const groupTitle = group ? dict.nav[group.key] : dict.nav.apply;
+  const groupTitle = bannerTitle ?? (group ? dict.nav[group.key] : dict.nav.apply);
+  const navTabs =
+    tabs ??
+    group?.children.map((c) => ({ href: `/${locale}${c.href}`, label: dict.nav[c.key], active: c.key === current })) ??
+    [];
 
   return (
     <>
@@ -29,17 +39,17 @@ export async function PageShell({
         <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-14 text-center text-white sm:py-20">
           <p className="text-xs font-semibold tracking-[0.3em] text-white/80">{banner.eyebrow}</p>
           <p className="mt-2 text-3xl font-bold sm:text-4xl">{groupTitle}</p>
-          {group && (
+          {navTabs.length > 0 && (
             <nav className="mt-6 flex flex-wrap justify-center gap-2">
-              {group.children.map((c) => (
+              {navTabs.map((c) => (
                 <Link
-                  key={c.key}
-                  href={`/${locale}${c.href}`}
+                  key={c.href}
+                  href={c.href}
                   className={`rounded-full px-4 py-1.5 text-sm backdrop-blur ${
-                    c.key === current ? "bg-white font-semibold text-brand" : "bg-white/15 text-white hover:bg-white/30"
+                    c.active ?"bg-white font-semibold text-brand" : "bg-white/15 text-white hover:bg-white/30"
                   }`}
                 >
-                  {dict.nav[c.key]}
+                  {c.label}
                 </Link>
               ))}
             </nav>
